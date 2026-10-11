@@ -1,0 +1,45 @@
+{
+  "nodes": {
+    "nixpkgs": {
+      "locked": {
+        "lastModified": 1782847189,
+        "narHash": "sha256-twXPFqFsrrY5r28Zh7Homgcp2gUMBgQ6WDS98Q/3xFI=",
+        "owner": "NixOS",
+        "repo": "nixpkgs",
+        "rev": "b6018f87da91d19d0ab4cf979885689b469cdd41",
+        "type": "github"
+      },
+      "original": {
+        "owner": "NixOS",
+        "ref": "nixos-25.11",
+        "repo": "nixpkgs",
+        "type": "github"
+      }
+    },
+    "root": {
+      "inputs": {
+        "nixpkgs": "nixpkgs",
+        "zenoh-bun": "zenoh-bun"
+      }
+    },
+    "zenoh-bun": {
+      "flake": false,
+      "locked": {
+        "lastModified": 1791709923,
+        "narHash": "sha256-WDMcw12LGSlAPqEa5+AvsRbwFhhukuLxw4smmjBEdL0=",
+        "owner": "jeff-hykin",
+        "repo": "zenoh-bun",
+        "rev": "589c92a96af660783355bc9cb8bd502e425c9a7b",
+        "type": "github"
+      },
+      "original": {
+        "owner": "jeff-hykin",
+        "ref": "v0.1.0",
+        "repo": "zenoh-bun",
+        "type": "github"
+      }
+    }
+  },
+  "root": "root",
+  "version": 7
+}

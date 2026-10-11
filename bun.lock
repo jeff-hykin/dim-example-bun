@@ -1,0 +1,15 @@
+{
+  "lockfileVersion": 1,
+  "configVersion": 1,
+  "workspaces": {
+    "": {
+      "name": "dim-example-bun",
+      "dependencies": {
+        "zenoh-bun": "github:jeff-hykin/zenoh-bun#v0.1.0",
+      },
+    },
+  },
+  "packages": {
+    "zenoh-bun": ["zenoh-bun@github:jeff-hykin/zenoh-bun#589c92a", {}, "jeff-hykin-zenoh-bun-589c92a", "sha512-l4f5f0yp81qWCcAAcjbEgImCVD8hxyL+Z4rxq86kfWlQqSwNagWkKNHOMR+rlekZtuwTUikM5boXwH9tkL9gqA=="],
+  }
+}

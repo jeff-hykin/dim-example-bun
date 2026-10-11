@@ -1,0 +1,11 @@
+{
+    "name": "dim-example-bun",
+    "private": true,
+    "type": "module",
+    "scripts": {
+        "serve": "bun run server/main.ts --port 8788"
+    },
+    "dependencies": {
+        "zenoh-bun": "github:jeff-hykin/zenoh-bun#v0.1.0"
+    }
+}

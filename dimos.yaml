@@ -1,0 +1,23 @@
+# the app's contract with Desktop: https://github.com/jeff-hykin/dimos-desktop-mirror/blob/main/docs/create-apps/index.md
+title: Example (Bun)
+spec-version: v1.2
+uses:
+    "@zenoh-gateway": ">=0.5 <0.6"
+provides:
+    description: "Example (Bun): a showcase dimOS app; its Bun server publishes live data over zenoh (zenoh-bun)"
+    endpoints:
+        - method: GET
+          path: api/hello
+          description: Who this app is, how long its server has been up, and how many zenoh samples it has published
+          role: context
+    private:
+        - api/internal/*
+# spec v1.2: what the page may do on zenoh, as zenoh's ACL config (deny by default). The page only listens to its own
+# server: <namespace>/apps/dim-example-bun/frontend/** (stats, echo, and dimos-react's url events).
+zenoh:
+    default_permission: deny
+    read:
+        - id: own-frontend-topics
+          messages: [declare_subscriber, put] # open the subscription, and receive its samples
+          key_exprs: ["dimos-desktop/*/apps/dim-example-bun/frontend/**"]
+          permission: allow

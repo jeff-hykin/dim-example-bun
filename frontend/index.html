@@ -1,0 +1,173 @@
+<!doctype html>
+<!--
+  A dimOS Desktop app page. Desktop serves it at /apps/<name>/, so every URL below is RELATIVE:
+    api/...        this app's own server (server/main.ts)                 -> /apps/<name>/api/...
+    ../../api/...  Desktop's own API (the zenoh-gateway's address, found by dimos-react) -> /api/...
+  Every call is declared in dimos.yaml, and so is what the page may do on zenoh (`zenoh:`, spec v1.2): read this app's
+  frontend topics, which its server publishes with zenoh-bun.
+-->
+<html lang="en">
+    <head>
+        <meta charset="utf-8" />
+        <meta name="viewport" content="width=device-width, initial-scale=1" />
+        <title>dimOS example app (Bun)</title>
+        <!-- No build: the libraries come from esm.sh by URL (pinned tags), and React is shared through this import map. -->
+        <script type="importmap">
+            {
+                "imports": {
+                    "react": "https://esm.sh/react@19.2.0",
+                    "react/": "https://esm.sh/react@19.2.0/",
+                    "react-dom": "https://esm.sh/react-dom@19.2.0",
+                    "react-dom/": "https://esm.sh/react-dom@19.2.0/",
+                    "dimos-react": "https://esm.sh/gh/jeff-hykin/dimos-react@v0.1.4/mod.js?external=react,react-dom"
+                }
+            }
+        </script>
+    </head>
+    <body>
+        <div id="root"></div>
+        <script type="module">
+            // The whole UI is dimos-react: Desktop's theme (followed live), cards, stats, sparklines, inputs, toasts, and
+            // the page's one zenoh-gateway connection (useBackendEvents hears this app's <zenohPrefix>/frontend/<topic>).
+            import { createRoot } from "react-dom/client"
+            import { useEffect, useState } from "react"
+            import {
+                AppProvider,
+                Button,
+                Card,
+                CodeBlock,
+                Column,
+                ConnectionStatus,
+                Heading,
+                Markdown,
+                Row,
+                Sparkline,
+                Stat,
+                Text,
+                TextInput,
+                h,
+                useBackendEvents,
+                useConnectionState,
+                useToast,
+            } from "dimos-react"
+
+            const HISTORY = 120 // samples kept for the sparklines (30 s at 4 Hz)
+
+            async function json(url, init) {
+                const response = await fetch(url, init)
+                const body = await response.json().catch(() => null)
+                if (!response.ok) {
+                    throw new Error(body?.error ?? `${response.status} ${response.statusText}`)
+                }
+                return body
+            }
+
+            const Section = ({ title, note, actions, children }) =>
+                h(Card, { title, actions }, h(Column, { gap: 12 }, note && h(Text, { muted: true, small: true }, h(Markdown, { inline: true, text: note })), children))
+
+            // ── 1: live data from the server over zenoh: <zenohPrefix>/frontend/stats at 4 Hz ──
+            function LiveStats() {
+                const [latest, setLatest] = useState(null)
+                const [history, setHistory] = useState({ cpu: [], rss: [], wave: [] })
+                const state = useConnectionState()
+                useBackendEvents((sample) => {
+                    setLatest(sample)
+                    setHistory((old) => ({
+                        cpu: [...old.cpu, sample.cpuPercent].slice(-HISTORY),
+                        rss: [...old.rss, sample.rssMiB].slice(-HISTORY),
+                        wave: [...old.wave, sample.wave].slice(-HISTORY),
+                    }))
+                }, { topic: "stats" })
+                const age = latest ? Math.max(0, Date.now() - latest.time) : null
+                return h(
+                    Section,
+                    {
+                        title: "1 · Live data from the Bun server, over zenoh",
+                        note: "server/main.ts publishes its vitals on `<zenohPrefix>/frontend/stats` with zenoh-bun; Desktop's zenoh-gateway hands them to this page (`useBackendEvents`)",
+                        actions: h(ConnectionStatus, { state, detail: age === null ? "waiting" : `${age} ms old` }),
+                    },
+                    h(
+                        Row,
+                        { gap: 28, wrap: true },
+                        h(Stat, { label: "sample", value: latest ? latest.counter : "—" }),
+                        h(Stat, { label: "uptime", value: latest ? latest.uptimeS.toFixed(1) : "—", unit: "s" }),
+                        h(Stat, { label: "cpu", value: latest ? latest.cpuPercent.toFixed(1) : "—", unit: "%" }),
+                        h(Stat, { label: "rss", value: latest ? latest.rssMiB.toFixed(1) : "—", unit: "MiB" }),
+                        h(Stat, { label: "load", value: latest ? latest.load1.toFixed(2) : "—" }),
+                    ),
+                    h(
+                        Row,
+                        { gap: 20, wrap: true },
+                        h(Column, { gap: 4 }, h(Text, { muted: true, small: true }, "sin(t)"), h(Sparkline, { values: history.wave, width: 220, height: 44, min: -1, max: 1 })),
+                        h(Column, { gap: 4 }, h(Text, { muted: true, small: true }, "cpu %"), h(Sparkline, { values: history.cpu, width: 220, height: 44, min: 0, color: "var(--warn)" })),
+                        h(Column, { gap: 4 }, h(Text, { muted: true, small: true }, "rss MiB"), h(Sparkline, { values: history.rss, width: 220, height: 44, color: "var(--ok)" })),
+                    ),
+                )
+            }
+
+            // ── 2: a round trip: HTTP to the server, zenoh back to every open page (<zenohPrefix>/frontend/echo) ──
+            function Echo() {
+                const toast = useToast()
+                const [text, setText] = useState("hello from the page")
+                const [echoes, setEchoes] = useState([])
+                useBackendEvents((echo) => {
+                    setEchoes((old) => [`${new Date(echo.at).toLocaleTimeString()}  ${echo.text}`, ...old].slice(0, 8))
+                    toast.ok(`zenoh echo: ${echo.text}`)
+                }, { topic: "echo" })
+                const send = () =>
+                    json("api/internal/echo", { method: "POST", headers: { "content-type": "application/json" }, body: JSON.stringify({ text }) })
+                        .catch((error) => toast.error(error.message))
+                return h(
+                    Section,
+                    {
+                        title: "2 · Page → server → zenoh → page",
+                        note: "`POST api/internal/echo` (private: only this app's pages may call it); the server publishes the text on `<zenohPrefix>/frontend/echo`, and every open page of the app hears it",
+                    },
+                    h(Row, { wrap: true }, h(TextInput, { value: text, onChange: setText, onEnter: send }), h(Button, { variant: "primary", icon: "send", onClick: send }, "Echo over zenoh")),
+                    echoes.length > 0 && h(CodeBlock, { code: echoes.join("\n"), language: "text", copy: false }),
+                )
+            }
+
+            // ── 3: the server's public endpoint (dimos.yaml provides:) ──
+            function Hello() {
+                const [hello, setHello] = useState(undefined)
+                const load = () => json("api/hello").then(setHello, setHello)
+                useEffect(() => {
+                    load()
+                }, [])
+                return h(
+                    Section,
+                    {
+                        title: "3 · This app's own server",
+                        note: "`GET api/hello` is public (dimos.yaml `provides:`): the agent and other apps may call it too",
+                        actions: h(Button, { size: "sm", icon: "refresh", onClick: load }, "Refresh"),
+                    },
+                    h(CodeBlock, {
+                        code: hello === undefined ? "…" : hello instanceof Error ? `✗ ${hello.message}` : JSON.stringify(hello, null, 2),
+                        language: "json",
+                    }),
+                )
+            }
+
+            function App() {
+                return h(
+                    Column,
+                    { gap: 14, style: { maxWidth: 760, margin: "0 auto", padding: "16px 16px calc(16px + var(--dim-inset-bottom, 0px))" } },
+                    h(
+                        "header",
+                        null,
+                        // inside Desktop, its window bar already names the app
+                        parent === self && h(Heading, { level: 1 }, "dimOS example app (Bun)"),
+                        h(Text, { muted: true, small: true }, "a Bun server (zenoh-bun) + a dimos-react page, no build"),
+                    ),
+                    h(LiveStats),
+                    h(Echo),
+                    h(Hello),
+                )
+            }
+
+            // AppProvider: Desktop's skin (followed live), the zenoh-gateway connection, toasts, dialogs, URL state
+            createRoot(document.getElementById("root")).render(h(AppProvider, null, h(App)))
+        </script>
+    </body>
+</html>
