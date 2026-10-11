@@ -44,7 +44,7 @@ One import map, no build: React and dimos-react from esm.sh at pinned versions.
             "react/": "https://esm.sh/react@19.2.0/",
             "react-dom": "https://esm.sh/react-dom@19.2.0",
             "react-dom/": "https://esm.sh/react-dom@19.2.0/",
-            "dimos-react": "https://esm.sh/gh/jeff-hykin/dimos-react@v0.1.4/mod.js?external=react,react-dom"
+            "dimos-react": "https://esm.sh/gh/jeff-hykin/dimos-react@v0.2.0-beta1/src/index.ts?external=react,react-dom,three"
         }
     }
 </script>
@@ -54,6 +54,8 @@ One import map, no build: React and dimos-react from esm.sh at pinned versions.
 hears this app's frontend topics:
 
 ```js
+import { createElement as h } from "react" // dimos-react v0.2 no longer re-exports it
+
 useBackendEvents((sample) => setLatest(sample), { topic: "stats" }) // <zenohPrefix>/frontend/stats
 
 h(Stat, { label: "cpu", value: latest.cpuPercent.toFixed(1), unit: "%" })

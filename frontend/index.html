@@ -19,7 +19,7 @@
                     "react/": "https://esm.sh/react@19.2.0/",
                     "react-dom": "https://esm.sh/react-dom@19.2.0",
                     "react-dom/": "https://esm.sh/react-dom@19.2.0/",
-                    "dimos-react": "https://esm.sh/gh/jeff-hykin/dimos-react@v0.1.4/mod.js?external=react,react-dom"
+                    "dimos-react": "https://esm.sh/gh/jeff-hykin/dimos-react@v0.2.0-beta1/src/index.ts?external=react,react-dom,three"
                 }
             }
         </script>
@@ -30,7 +30,7 @@
             // The whole UI is dimos-react: Desktop's theme (followed live), cards, stats, sparklines, inputs, toasts, and
             // the page's one zenoh-gateway connection (useBackendEvents hears this app's <zenohPrefix>/frontend/<topic>).
             import { createRoot } from "react-dom/client"
-            import { useEffect, useState } from "react"
+            import { createElement as h, useEffect, useState } from "react"
             import {
                 AppProvider,
                 Button,
@@ -45,7 +45,6 @@
                 Stat,
                 Text,
                 TextInput,
-                h,
                 useBackendEvents,
                 useConnectionState,
                 useToast,
