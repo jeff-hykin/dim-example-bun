@@ -4,11 +4,16 @@ spec-version: v1.2
 uses:
     "@zenoh-gateway": ">=0.5 <0.6"
 provides:
+    when: you want to check that the Bun example app's server is alive
     description: "Example (Bun): a showcase dimOS app; its Bun server publishes live data over zenoh (zenoh-bun)"
     endpoints:
         - method: GET
           path: api/hello
-          description: Who this app is, how long its server has been up, and how many zenoh samples it has published
+          when: you need to know whether the Bun example's server and zenoh are up
+          description: >-
+              Who this app is and how its server is doing. Takes nothing; answers JSON: shape ("Bun"), app (its name),
+              bun (the Bun version), uptimeS (seconds its server has been up), zenoh ("connected" or "unavailable"),
+              published (how many stats samples it has published on zenoh) and statsKey (the zenoh key it publishes on)
           role: context
     private:
         - api/internal/*
