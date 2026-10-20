@@ -72,7 +72,7 @@ The page may only listen to its own server's frontend topics; everything else on
 (`--name`), change `dim-example-bun` in the key.
 
 ```yaml
-spec-version: v1.2
+spec-version: v1.3
 uses:
     "@zenoh-gateway": ">=0.5 <0.6"
 zenoh:

@@ -1,22 +1,28 @@
 # the app's contract with Desktop: https://github.com/jeff-hykin/dimos-desktop-mirror/blob/main/docs/create-apps/index.md
 title: Example (Bun)
-spec-version: v1.2
+spec-version: v1.3
 uses:
     "@zenoh-gateway": ">=0.5 <0.6"
+# what the agent and other apps may call: an OpenAPI 3.1 document, its paths relative to the app
 provides:
-    when: you want to check that the Bun example app's server is alive
-    description: "Example (Bun): a showcase dimOS app; its Bun server publishes live data over zenoh (zenoh-bun)"
-    endpoints:
-        - method: GET
-          path: api/hello
-          when: you need to know whether the Bun example's server and zenoh are up
-          description: >-
-              Who this app is and how its server is doing. Takes nothing; answers JSON: shape ("Bun"), app (its name),
-              bun (the Bun version), uptimeS (seconds its server has been up), zenoh ("connected" or "unavailable"),
-              published (how many stats samples it has published on zenoh) and statsKey (the zenoh key it publishes on)
-          role: context
-    private:
+    openapi: 3.1.0
+    info:
+        title: Example (Bun)
+        version: 1.0.0 # this API's version: major = breaking, minor = added
+        description: 'Example (Bun): a showcase dimOS app; its Bun server publishes live data over zenoh (zenoh-bun)'
+        x-when: you want to check that the Bun example app's server is alive
+    x-private: # paths only this app's own pages may call
         - api/internal/*
+    paths:
+        /api/hello:
+            get:
+                description: >-
+                    Who this app is and how its server is doing. Takes nothing; answers JSON: shape ("Bun"), app (its name),
+                    bun (the Bun version), uptimeS (seconds its server has been up), zenoh ("connected" or "unavailable"),
+                    published (how many stats samples it has published on zenoh) and statsKey (the zenoh key it publishes
+                    on)
+                x-when: you need to know whether the Bun example's server and zenoh are up
+                x-dimos-role: context # added to the agent's desktop_context() while the app is focused
 # spec v1.2: what the page may do on zenoh, as zenoh's ACL config (deny by default). The page only listens to its own
 # server: <namespace>/apps/dim-example-bun/frontend/** (stats, echo, and dimos-react's url events).
 zenoh:
