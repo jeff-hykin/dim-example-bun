@@ -1,6 +1,6 @@
 # the app's contract with Desktop: https://github.com/jeff-hykin/dimos-desktop-mirror/blob/main/docs/create-apps/index.md
 title: Example (Bun)
-version: "0.1.8"
+version: "0.2.0"
 spec-version: v1.4
 uses:
     "@zenoh-gateway": ">=0.5 <0.6" # also covers dimos-react finding it: GET /gateways/desktop/management/gateways/zenoh
