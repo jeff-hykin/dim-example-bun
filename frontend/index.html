@@ -1,8 +1,8 @@
 <!doctype html>
 <!--
   A dimOS Desktop app page. Desktop serves it at /apps/<name>/, so every URL below is RELATIVE:
-    api/...        this app's own server (server/main.ts)                 -> /apps/<name>/api/...
-    ../../api/...  Desktop's own API (the zenoh-gateway's address, found by dimos-react) -> /api/...
+    api/...                     this app's own server (server/main.ts) -> /apps/<name>/api/...
+    ../../gateways/desktop/...  Desktop's own API (the zenoh-gateway's address, found by dimos-react) -> /gateways/desktop/...
   Every call is declared in dimos.yaml, and so is what the page may do on zenoh (`zenoh:`, spec v1.2): read this app's
   frontend topics, which its server publishes with zenoh-bun.
 -->
@@ -19,7 +19,7 @@
                     "react/": "https://esm.sh/react@19.2.0/",
                     "react-dom": "https://esm.sh/react-dom@19.2.0",
                     "react-dom/": "https://esm.sh/react-dom@19.2.0/",
-                    "dimos-react": "https://esm.sh/gh/jeff-hykin/dimos-react@v0.2.0-beta16/src/index.ts?external=react,react-dom,three"
+                    "dimos-react": "https://esm.sh/gh/jeff-hykin/dimos-react@v0.3.1/src/index.ts?external=react,react-dom,three"
                 }
             }
         </script>

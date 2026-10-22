@@ -44,7 +44,7 @@ One import map, no build: React and dimos-react from esm.sh at pinned versions.
             "react/": "https://esm.sh/react@19.2.0/",
             "react-dom": "https://esm.sh/react-dom@19.2.0",
             "react-dom/": "https://esm.sh/react-dom@19.2.0/",
-            "dimos-react": "https://esm.sh/gh/jeff-hykin/dimos-react@v0.2.0-beta16/src/index.ts?external=react,react-dom,three"
+            "dimos-react": "https://esm.sh/gh/jeff-hykin/dimos-react@v0.3.1/src/index.ts?external=react,react-dom,three"
         }
     }
 </script>
@@ -72,7 +72,7 @@ The page may only listen to its own server's frontend topics; everything else on
 (`--name`), change `dim-example-bun` in the key.
 
 ```yaml
-spec-version: v1.3
+spec-version: v1.4
 uses:
     "@zenoh-gateway": ">=0.5 <0.6"
 zenoh:
