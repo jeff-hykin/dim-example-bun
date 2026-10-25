@@ -2,7 +2,11 @@
 // Desktop gives, and talks zenoh itself with zenoh-bun (zenoh inside this process, loaded with bun:ffi).
 //
 // What Desktop passes: one env var, DIMOS_APP, a JSON object (Desktop's docs/apps.md, "dimos-app-server"):
-//   { version, name, socket, url, path, dataDir, desktopUrl, zenohGatewayUrl, zenohConnect, zenohNamespace, zenohPrefix, … }
+//   { version, name, socket, url, path, dataDir, desktopUrl, zenohGatewayUrl, zenohGatewayToken, zenohConnect,
+//     zenohNamespace, zenohPrefix, dimosDir, dimosPython, recordingsDir, machineId, secrets }
+// Read the fields you use and ignore the rest. `secrets` is the app's own secrets (its zenohGatewayToken among them)
+// and is never printed or passed on. Which of them this app needs is declared in its dimos.yaml,
+// `uses: "@desktop-gateway": env:` (spec v1.5).
 // Requests arrive with the app's path (/apps/<name>) already removed: "/api/hello", "/", "/index.html".
 //
 // Live data: every 250 ms the server publishes its own vitals on <zenohPrefix>/frontend/stats with zenoh-bun; the

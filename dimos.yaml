@@ -1,9 +1,23 @@
 # the app's contract with Desktop: https://github.com/jeff-hykin/dimos-desktop-mirror/blob/main/docs/create-apps/index.md
 title: Example (Bun)
-version: "0.2.1"
-spec-version: v1.4
+version: "0.3.0"
+spec-version: v1.5
 uses:
     "@zenoh-gateway": ">=0.5 <0.6" # also covers dimos-react finding it: GET /gateways/desktop/management/gateways/zenoh
+    "@desktop-gateway":
+        # spec v1.5: the values this server needs of Desktop's environment, keyed per value of DIMOS_APP rather than
+        # per variable (every app gets DIMOS_APP, so naming the variable says nothing). `app check` reports one
+        # Desktop doesn't set, and a launch that can't resolve one says so in the app's own log. No endpoints here:
+        # this app calls Desktop's own API for nothing.
+        env:
+            DIMOS_APP.socket: the unix socket this server binds (--port stands in outside Desktop)
+            DIMOS_APP.name: the name this app was installed under
+            DIMOS_APP.zenohConnect:
+                required: false
+                description: the zenoh endpoint its own session dials
+            DIMOS_APP.zenohPrefix:
+                required: false
+                description: this app's own subtree of the namespace
 # what the agent and other apps may call: an OpenAPI 3.1 document, its paths relative to the app
 provides:
     openapi: 3.1.0
